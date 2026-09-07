@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dracore - 让你的服务器 喷火，而不是冒烟</title>
-<meta name="description" content="Dracore 是基于 Paper 深度优化的 Minecraft 服务端核心：极致优化、多线程、完全插件兼容、高度自定义。同场景实测性能对比 Leaf。">
+<meta name="description" content="Dracore 是基于 Paper 深度优化的 Minecraft 服务端核心：极致优化、多线程、完全插件兼容、高度自定义。">
 <style>
-  /* ================= 主题变量 ================= */
   :root[data-theme="dark"] {
     --bg: #121016; --bg-card: #1d1924; --bg-code: #0d0b11;
     --text: #f2ecf2; --text-dim: #b3aab6; --line: #2c2530;
@@ -20,7 +19,6 @@
     --card-bg: rgba(255,255,255,.92); --code-bg: #f4f1f6;
     --nav-bg: rgba(255,255,255,.78); --th-bg: rgba(255,77,157,.08);
     --blob-op: .22; --shine: rgba(0,0,0,.04);
-    /* 亮色下文字强调色整体加深，避免浅粉糊在白底上；渐变背景仍鲜艳 */
     --magenta: #e1308a; --pink: #c21f79; --pink-soft: #8f1459; --cm: #6a6372;
     --violet: #7c3aed; --ember: #ea7317; --val: #1f6fb5;
   }
@@ -40,8 +38,6 @@
   a { color: var(--pink); text-decoration: none; }
   a:hover { color: var(--magenta); }
   .container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
-
-  /* ===== 流动渐变背景 ===== */
   .bg-flow { position: fixed; inset: 0; z-index: -2; overflow: hidden; background: var(--bg); }
   .bg-flow .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: var(--blob-op);
     animation: drift 26s ease-in-out infinite alternate; }
@@ -63,8 +59,6 @@
     content: ""; position: absolute; inset: 0;
     background: radial-gradient(ellipse 70% 40% at 50% -5%, rgba(255,77,157,.14), transparent 70%);
   }
-
-  /* ===== 流动渐变文字 ===== */
   .grad-flow {
     background: linear-gradient(90deg, var(--magenta), var(--violet), var(--ember), var(--pink), var(--magenta));
     background-size: 300% 100%;
@@ -72,8 +66,6 @@
     animation: flowText 7s linear infinite;
   }
   @keyframes flowText { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
-
-  /* ===== 龙标：emoji 仅作遮罩形状，颜色全来自背景渐变（纯单色） ===== */
   .dragon {
     display: inline-block; width: 1.25em; height: 1.25em; margin-right: 7px;
     vertical-align: -0.28em;
@@ -86,8 +78,6 @@
     -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
     -webkit-mask-position: center; mask-position: center;
   }
-
-  /* ===== 导航 ===== */
   nav { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(14px);
     background: var(--nav-bg); border-bottom: 1px solid var(--line); }
   .nav-inner { max-width: 1040px; margin: 0 auto; padding: 14px 24px;
@@ -103,12 +93,8 @@
     transition: border-color .2s, color .2s;
   }
   .theme-btn:hover { border-color: var(--magenta); color: var(--magenta); }
-
-  /* ===== 视图切换 ===== */
   .view { display: none; }
   .view.active { display: block; }
-
-  /* ===== Hero ===== */
   .hero { text-align: center; padding: 96px 24px 72px; }
   .badge { display: inline-block; font-size: 13px; color: var(--pink-soft); font-weight: 600;
     border: 1px solid rgba(255,77,157,.45); background: linear-gradient(120deg, rgba(255,77,157,.14), rgba(139,92,246,.14));
@@ -127,14 +113,10 @@
   .stats { display: flex; gap: 52px; justify-content: center; margin-top: 56px; flex-wrap: wrap; }
   .stat b { display: block; font-size: 30px; }
   .stat span { font-size: 13.5px; color: var(--text-dim); }
-
-  /* ===== 通用 section ===== */
   section { padding: 64px 0; }
   .sec-tag { font-size: 13px; letter-spacing: 2px; font-weight: 600; margin-bottom: 8px; }
   h2 { font-size: 30px; font-weight: 800; margin-bottom: 14px; }
   .sec-sub { color: var(--text-dim); max-width: 660px; }
-
-  /* ===== 卡片 ===== */
   .bench { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 16px; margin-top: 32px; }
   .bench-card { position: relative; background: var(--card-bg); border: 1px solid var(--line); border-radius: 14px;
     padding: 22px; overflow: hidden; transition: transform .15s, border-color .2s; }
@@ -146,10 +128,34 @@
   .bench-card b { font-size: 30px; }
   .bench-card span { display: block; margin-top: 6px; color: var(--text-dim); font-size: 14px; }
   .bench-card .note { font-size: 12px; color: var(--text-dim); margin-top: 10px; opacity: .85; }
+  .bench-hero { position: relative; overflow: hidden; border-radius: 16px;
+    border: 1px solid rgba(255,77,157,.55);
+    background: linear-gradient(160deg, rgba(255,77,157,.14), rgba(139,92,246,.10)), var(--card-bg);
+    box-shadow: 0 0 44px rgba(255,77,157,.18);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 26px;
+    padding: 34px 38px; margin-top: 32px; }
+  .bench-hero::before { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(115deg, transparent 30%, var(--shine) 45%, transparent 60%);
+    transform: translateX(-100%); transition: transform .7s ease; pointer-events: none; }
+  .bench-hero:hover::before { transform: translateX(100%); }
+  .bench-hero .tps { font-size: clamp(58px, 9vw, 96px); font-weight: 900; line-height: 1;
+    letter-spacing: -1px; display: block; }
+  .bench-hero .tps small { font-size: .36em; font-weight: 800; letter-spacing: 0; }
+  .bench-hero .label { color: var(--text-dim); font-size: 15px; margin-top: 10px; display: block; }
+  .bench-hero .side { margin-left: auto; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip { padding: 6px 14px; border-radius: 999px; font-size: 13.5px; font-weight: 800;
+    color: #fff; background: linear-gradient(90deg, var(--magenta), var(--violet));
+    box-shadow: 0 4px 14px rgba(255,77,157,.45); white-space: nowrap; }
+  .chip.ghost { background: rgba(128,128,128,.12); color: var(--text); box-shadow: none; }
+  .bench-hero .meta { color: var(--text-dim); font-size: 14px; margin-top: 12px; }
+  @media (max-width: 720px) {
+    .bench-hero { flex-direction: column; align-items: flex-start; gap: 18px; padding: 24px 22px; }
+    .bench-hero .side { margin-left: 0; }
+  }
   .bench-card.hl { border-color: rgba(255,77,157,.6);
     background: linear-gradient(160deg, rgba(255,77,157,.12), rgba(139,92,246,.08)), var(--card-bg);
     box-shadow: 0 0 34px rgba(255,77,157,.16); }
-  /* 倍率徽章：卡片右上角悬浮，亮暗双主题都醒目 */
   .multiplier {
     display: block; width: -moz-fit-content; width: fit-content;
     margin: 0 0 12px 0; padding: 5px 13px; border-radius: 999px;
@@ -170,7 +176,6 @@
   .card p + p { margin-top: 8px; }
   h3 { font-size: 18px; font-weight: 700; margin: 26px 0 10px; }
   h3:first-child { margin-top: 0; }
-
   .config-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; margin-top: 32px; }
   @media (max-width: 800px) { .config-wrap { grid-template-columns: 1fr; } }
   .config-list { list-style: none; }
@@ -181,14 +186,12 @@
   ul.list li::before { content: "◈ "; color: var(--magenta); }
   ol.list { margin: 10px 0 10px 22px; color: var(--text-dim); font-size: 14.5px; }
   ol.list li { padding: 3px 0; }
-
   pre.code { background: var(--code-bg); border: 1px solid var(--line); border-radius: 14px;
     padding: 20px 22px; font-size: 13px; overflow-x: auto; line-height: 1.75;
     font-family: "Cascadia Code", Consolas, monospace; }
   pre.code .cm { color: var(--cm); }
   pre.code .key { color: var(--pink); }
   pre.code .val { color: var(--val); }
-
   table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
   th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: left; vertical-align: top; }
   th { background: var(--th-bg); color: var(--pink-soft); font-weight: 700; }
@@ -204,8 +207,6 @@
   details { background: var(--card-bg); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; margin-top: 12px; }
   details summary { cursor: pointer; font-weight: 600; font-size: 15px; }
   details p { margin-top: 10px; color: var(--text-dim); font-size: 14.5px; }
-
-  /* ===== 下载页（LeafMC 风） ===== */
   .dl-hero { text-align: center; padding: 64px 24px 24px; }
   .dl-hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 800; }
   .dl-hero p { color: var(--text-dim); margin-top: 10px; }
@@ -220,29 +221,20 @@
   .build-actions { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
   .changelog { margin-top: 16px; }
   .changelog li { padding: 4px 0; color: var(--text-dim); font-size: 14px; }
-
-  /* ===== 文档页头 ===== */
   .doc-head { text-align: center; padding: 56px 24px 24px; }
   .doc-head h1 { font-size: clamp(30px, 5vw, 42px); font-weight: 800; }
   .doc-head p { color: var(--text-dim); margin-top: 10px; }
   .doc-nav { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 22px; font-size: 13.5px; }
   .doc-nav a { background: var(--card-bg); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; }
-
   footer { border-top: 1px solid var(--line); padding: 34px 24px; text-align: center;
     color: var(--text-dim); font-size: 13.5px; margin-top: 40px; }
-
-  /* 页内锚点跳转时避开固定导航 */
   section[id] { scroll-margin-top: 92px; }
-
-  /* ================= 移动端排版 ================= */
-  /* 表格：小屏改为可横向滚动，避免撑破视口 */
   @media (max-width: 860px) {
     .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { display: block; width: 100%; min-width: 620px; overflow-x: auto;
       -webkit-overflow-scrolling: touch; }
     table th, table td { white-space: normal; }
   }
-
   @media (max-width: 720px) {
     .container { padding: 0 16px; }
     .nav-inner { padding: 10px 16px; gap: 6px; }
@@ -250,7 +242,6 @@
     .nav-right { width: 100%; justify-content: space-between; gap: 10px; }
     .nav-links { gap: 14px; font-size: 13px; flex-wrap: wrap; }
     .theme-btn { padding: 4px 10px; font-size: 12px; }
-
     .hero { padding: 56px 18px 40px; }
     .hero h1 { font-size: clamp(26px, 8vw, 38px); }
     .hero p.sub { font-size: 15.5px; margin-bottom: 26px; }
@@ -260,7 +251,6 @@
     .stats { gap: 24px 32px; margin-top: 36px; }
     .stat b { font-size: 25px; }
     .stat span { font-size: 12.5px; }
-
     section { padding: 44px 0; }
     h2 { font-size: 24px; }
     .sec-sub { font-size: 14.5px; }
@@ -269,7 +259,6 @@
     .card { padding: 18px 18px; }
     .config-wrap { gap: 20px; }
     pre.code { font-size: 12px; padding: 14px 16px; }
-
     .doc-head { padding: 36px 18px 12px; }
     .doc-head h1 { font-size: clamp(24px, 7vw, 32px); }
     .doc-nav { gap: 8px; font-size: 12.5px; }
@@ -279,25 +268,18 @@
     .faq-intro { margin-bottom:18px; }
     .faq-group-label { margin-top:24px; }
     details p, .card p, .feature p { font-size: 14px; }
-
     .dl-hero { padding: 40px 18px 8px; }
     .build-head { flex-direction: column; align-items: flex-start; gap: 8px; }
     .build-meta { gap: 8px 16px; font-size: 13px; }
     .build-title { font-size: 18px; }
-
     footer { padding: 26px 16px; font-size: 12.5px; }
   }
-
   @media (max-width: 420px) {
     .nav-links { gap: 11px; font-size: 12.5px; }
     .stat b { font-size: 22px; }
     .stats { gap: 18px 24px; }
     .multiplier { font-size: 11.5px; padding: 4px 10px; }
   }
-
-  /* =========================================================
-     Dracore UI Refresh — performance dashboard + glass system
-     ========================================================= */
   :root {
     --radius-lg: 22px;
     --radius-md: 16px;
@@ -308,13 +290,11 @@
     --glass-border: rgba(40,25,50,.09);
     --shadow-soft: 0 18px 60px rgba(80,40,90,.10);
   }
-
   body {
     background:
       radial-gradient(900px 500px at 50% -180px, rgba(255,77,157,.10), transparent 70%),
       var(--bg);
   }
-
   .bg-flow::before {
     content:"";
     position:absolute;
@@ -327,7 +307,6 @@
     mask-image:linear-gradient(to bottom, #000, transparent 72%);
     pointer-events:none;
   }
-
   nav {
     background: color-mix(in srgb, var(--bg) 72%, transparent);
     box-shadow: 0 1px 0 rgba(255,255,255,.025);
@@ -351,12 +330,10 @@
   }
   .nav-links a:hover::after,
   .nav-links a.active::after { transform:scaleX(1); }
-
   .theme-btn {
     background:rgba(255,255,255,.035);
     backdrop-filter:blur(10px);
   }
-
   .hero {
     position:relative;
     padding-top:112px;
@@ -382,7 +359,6 @@
     line-height:1.85;
     font-size:16px;
   }
-
   .hero-status {
     display:inline-flex;
     align-items:center;
@@ -408,7 +384,6 @@
     background:#5ee28a;
     box-shadow:0 0 0 4px rgba(94,226,138,.10),0 0 14px rgba(94,226,138,.5);
   }
-
   .performance-strip {
     position:relative;
     display:grid;
@@ -457,7 +432,6 @@
   .perf-item b span { display:inline;font-size:13px;margin-left:2px;color:var(--text-dim); }
   .perf-item b.accent { color:var(--pink); }
   .perf-item small { color:var(--text-dim);font-size:11px; }
-
   .actions .btn {
     border-radius:13px;
     box-shadow:none;
@@ -465,7 +439,6 @@
   .btn-primary {
     box-shadow:0 10px 35px rgba(255,77,157,.24);
   }
-
   section { position:relative; }
   section::before {
     content:"";
@@ -484,7 +457,6 @@
     background:linear-gradient(90deg,var(--magenta),transparent);
   }
   h2 { letter-spacing:-.6px; }
-
   .bench {
     grid-template-columns:1.15fr .85fr .85fr .85fr;
     align-items:stretch;
@@ -522,7 +494,6 @@
   .bench-kicker em { font-style:normal;color:var(--pink-soft);font-size:11px; }
   .bench-card.hl > .grad-flow { display:block; }
   .multiplier { margin-bottom:12px; }
-
   .feature,.card,.build,details {
     border-radius:18px;
     box-shadow:0 10px 40px rgba(0,0,0,.055);
@@ -535,7 +506,6 @@
     font-size:21px;
   }
   .feature h3 { margin-top:0; }
-
   table { border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:14px; }
   th:first-child { border-radius:12px 0 0 0; }
   th:last-child { border-radius:0 12px 0 0; }
@@ -543,12 +513,10 @@
   tr:last-child td { border-bottom:0; }
   th { padding:11px 13px; }
   td { padding:10px 13px; }
-
   pre.code {
     border-radius:16px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
   }
-
   .build {
     padding:28px;
     position:relative;
@@ -562,7 +530,6 @@
     background:radial-gradient(circle,rgba(255,77,157,.16),transparent 68%);
     pointer-events:none;
   }
-
   details {
     transition:border-color .2s,background .2s;
   }
@@ -583,9 +550,7 @@
   .faq-group-label .grad-flow { font-size:11px; letter-spacing:1.5px; font-weight:800; }
   .faq-group-label::before { content:""; width:3px; height:18px; border-radius:99px; background:linear-gradient(180deg,var(--magenta),var(--violet)); }
   .faq-group-label:first-child { margin-top:0; }
-
   footer { background:rgba(0,0,0,.06); }
-
   @media (max-width: 900px) {
     .bench { grid-template-columns:1fr 1fr; }
     .performance-strip { grid-template-columns:1.4fr 1px 1fr 1fr; }
@@ -614,11 +579,6 @@
     .performance-strip { border-radius:17px; }
     .perf-value { font-size:38px; }
   }
-
-
-/* =========================================================
-   Dracore Mature UI — production-grade visual system
-   ========================================================= */
 :root{
   --max:1180px;
   --surface:rgba(18,17,23,.78);
@@ -836,7 +796,6 @@ footer p{font-size:12px}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}
 }
-
 .docs-toc a.toc-active{color:var(--text);background:var(--surface-2);box-shadow:inset 2px 0 0 var(--magenta)}
 </style>
 </head>
@@ -864,15 +823,15 @@ footer p{font-size:12px}
   </div>
 </nav>
 
-<!-- ================= 首页 ================= -->
+
 <div class="view active" id="view-home">
   <header class="hero">
     <div class="hero-status"><span class="status-dot"></span><span>Paper 1.21.11</span><i></i><span>Ryzen 9 7940HX 实测</span><i></i><span>性能压测模式</span></div>
     <h1>让你的服务器 <span class="grad-flow">喷火<br>而不是冒烟</span></h1>
     <p class="sub">
       Dracore —— <b>拳打 Paper，脚踩 Folia</b><br>
-      同场景 150 假人实测 <b>TPS 峰值 15.9</b>，是 Leaf 的 2 倍多<br>
-      <b>优化、稳定、兼容、多线程，全都要，而且全都要最好</b>
+      同场景 150 假人实测 <b>TPS 峰值 15.9</b>，是 Paper 的 5 倍多<br>
+      <b>优化、稳定、兼容、多线程，我全都要</b>
     </p>
     <div class="actions">
       <a class="btn btn-primary" href="#/download">获取 Dracore</a>
@@ -891,8 +850,8 @@ footer p{font-size:12px}
       </div>
       <div class="perf-item">
         <span>性能优势</span>
-        <b class="accent">2.04<span>×</span></b>
-        <small>相对 Leaf</small>
+        <b class="accent">5.2<span>×</span></b>
+        <small>相对 Paper</small>
       </div>
       <div class="perf-item">
         <span>优化补丁</span>
@@ -912,11 +871,24 @@ footer p{font-size:12px}
       <div class="sec-tag"><span class="grad-flow">BENCHMARK</span></div>
       <h2>基准测试结果</h2>
       <p class="sec-sub">同一份世界、150 个假人（半径 1000 漫游）、相同 JVM 参数（Aikar G1 flags + GC 日志），全部性能选项开启，实测 5 分钟取值。数据只展示同条件下的实测结果。</p>
-      <div class="bench">
-        <div class="bench-card hl"><div class="bench-kicker"><span class="bench-icon">↗</span><span>性能领先</span><strong>2.04×</strong><em>vs Leaf</em></div><b class="grad-flow">14.5 TPS</b><span>Dracore 全开 · 峰值 15.9</span><div class="note">MSPT 64.8ms · Ryzen 9 7940HX 本机实测</div></div>
-        <div class="bench-card"><b>7.1 TPS</b><span>Leaf 全开 · 对照组</span><div class="note">MSPT 139.6ms · 相同 JVM 参数，依旧跑不动</div></div>
-        <div class="bench-card"><b>8.9 TPS</b><span>Dracore 路径点治理前</span><div class="note">砍掉一个 O(n²) 系统 = 白捡 5.6 TPS</div></div>
-        <div class="bench-card"><b>2.8 TPS</b><span>Paper 原版（对照组）</span><div class="note">同一世界同一批假人，原版就是这么惨</div></div>
+      <div class="bench-hero">
+        <div>
+          <b class="grad-flow tps">15.9<small> TPS</small></b>
+          <span class="label">Dracore 性能项全开 · 均值 14.5 · MSPT 64.8ms · Ryzen 9 7940HX 本机实测</span>
+        </div>
+        <div class="side">
+          <div class="chips">
+            <span class="chip">是 Paper 的 5.2 倍</span>
+            <span class="chip ghost">拥有超过 40+ 深度优化补丁</span>
+          </div>
+          <p class="meta">150 假人 · 半径 1000 漫游 · 模拟距离 10 · 相同 JVM 参数 · 5 分钟采样</p>
+        </div>
+      </div>
+      <div class="bench" style="margin-top:16px;">
+        <div class="bench-card"><b>最高 2.8 TPS</b><span>Paper 原版</span><div class="note">实测 2.8，这 TPS 狗都不玩，没有优化的 Paper 就是这个水平</div></div>
+        <div class="bench-card"><b>最高 8.9 TPS</b><span>Leaf 性能项全开</span><div class="note">峰值就这？和没开优化的 Dracore 打个平手</div></div>
+        <div class="bench-card"><b>最高 6.5 TPS</b><span>Purpur</span><div class="note">实测 6.5，比 Paper 强一点，也就一点点</div></div>
+        <div class="bench-card"><b>平均 8.9 TPS</b><span>Dracore 未开优化</span><div class="note">同一个我们，关掉全部优化的样子，这40多个补丁值不值，一目了然</div></div>
       </div>
       <p class="sec-sub" style="margin-top:18px;">💡 同一份世界、同一批假人、同一套参数——<b>如果你的 CPU 比作者的 7940HX 更强，你的成绩只会比这里更漂亮。</b>瓶颈从来不在 Dracore，在你敢给它多大的世界。</p>
     </div>
@@ -968,7 +940,7 @@ footer p{font-size:12px}
   </section>
 </div>
 
-<!-- ================= FAQ（独立视图） ================= -->
+
 <div class="view" id="view-faq">
   <div class="container">
     <div class="doc-head">
@@ -990,8 +962,7 @@ footer p{font-size:12px}
       <details data-faq><summary>Dracore 会修改原版玩法吗？</summary><p>默认优先保持 Paper 行为。可能改变玩法或时序的项目会作为独立配置提供，例如路径点更新节流、DAB、生物激活范围、部分红石参数以及可选的 1.8 战斗机制。每项都应该能够在「行为差异」中找到对应说明。</p></details>
 
       <div class="faq-group-label"><span class="grad-flow">MIGRATION</span><span>迁移与升级</span></div>
-      <details data-faq><summary>从 Paper / Leaf 迁移需要重做世界吗？</summary><p>正常情况下不需要。停服后完整备份服务器目录，再替换核心并启动即可。插件、世界和大多数服务端配置继续使用原文件；首次启动后再按 Dracore 文档检查新增配置。任何核心更换都建议先在测试服验证。</p></details>
-      <details data-faq><summary>从 Leaf 换到 Dracore 最大的区别是什么？</summary><p>Leaf 同样强调性能、稳定性与 Paper 兼容性；Dracore 更强调“可选优化 + 可诊断 + 逐项异步化”的路线。不要只看宣传倍率，真正决定生产环境体验的是插件兼容、实际负载、MSPT、GC 和长期稳定性。</p></details>
+      <details data-faq><summary>从 Paper / Purpur / Leaf 迁移需要重做世界吗？</summary><p>正常情况下不需要。停服后完整备份服务器目录，再替换核心并启动即可。插件、世界和大多数服务端配置继续使用原文件；首次启动后再按 Dracore 文档检查新增配置。任何核心更换都建议先在测试服验证。</p></details>
       <details data-faq><summary>Dracore 会跟进上游版本吗？</summary><p>服务端核心依赖上游 Minecraft / Paper 的更新。正式生产服建议优先选择已经完成构建、测试与插件验证的版本，而不是仅仅因为版本号更新就立即升级。升级前应阅读变更日志并保留可回滚的旧核心。</p></details>
       <details data-faq><summary>升级核心前最重要的事情是什么？</summary><p>备份。至少保留世界、玩家数据、插件配置、核心配置和当前可运行的核心 JAR。升级后先在测试环境启动并观察日志，再逐步恢复插件与高负载玩法。</p></details>
 
@@ -1022,7 +993,7 @@ footer p{font-size:12px}
   </div>
 </div>
 
-<!-- ================= 下载页 ================= -->
+
 <div class="view" id="view-download">
   <div class="container">
     <div class="dl-hero">
@@ -1030,10 +1001,7 @@ footer p{font-size:12px}
       <p>选择目标 Minecraft 版本，查看构建信息与安装要求。</p>
     </div>
 
-    <!-- ===== 新增构建：复制下面整个 <div class="build"> ... </div> 块，
-             改 build-title 的版本号、build-meta 里的信息、changelog 条目，
-             最重要的是把 build-actions 里 <a class="btn btn-primary" href="..."> 的 href 换成真实的 jar 直链
-             （GitHub Releases 附件直链 / 镜像都行）。旧版本记得去掉 .latest 类并保留 build-tag 样式。 ===== -->
+    
     <div class="build latest">
       <div class="build-head">
         <div class="build-title">Dracore 1.21.11 <span class="grad-flow" id="relVersion">v1</span></div>
@@ -1055,14 +1023,14 @@ footer p{font-size:12px}
         <li>并行世界 tick（SparklyPaper 移植，默认关，多世界场景启用）</li>
       </ul>
       <div class="build-actions">
-        <!-- ↓ 无 Release 时保持禁用态；发布后由下方脚本自动读取 releases/latest 并填充链接 -->
+        
         <a id="relDl" class="btn btn-primary btn-disabled" aria-disabled="true" href="#">获取最新构建…</a>
         <a class="btn btn-ghost" href="https://github.com/dracave/dracave/releases" target="_blank" rel="noopener">GitHub Releases 页</a>
         <a class="btn btn-ghost" href="#/docs">安装与配置文档</a>
       </div>
       <p class="build-meta" id="relStatus" style="margin-top:12px">正在从 GitHub Releases 获取最新构建信息…</p>
     </div>
-    <!-- ===== 构建块结束 ===== -->
+    
 
     <div class="card" style="margin-top:28px;">
       <h3>安装步骤</h3>
@@ -1078,7 +1046,7 @@ footer p{font-size:12px}
   </div>
 </div>
 
-<!-- ================= 文档页 ================= -->
+
 <div class="view" id="view-docs">
   <div class="container">
     <div class="doc-head">
