@@ -231,6 +231,9 @@
   footer { border-top: 1px solid var(--line); padding: 34px 24px; text-align: center;
     color: var(--text-dim); font-size: 13.5px; margin-top: 40px; }
 
+  /* 页内锚点跳转时避开固定导航 */
+  section[id] { scroll-margin-top: 92px; }
+
   /* ================= 移动端排版 ================= */
   /* 表格：小屏改为可横向滚动，避免撑破视口 */
   @media (max-width: 860px) {
@@ -1033,15 +1036,16 @@ footer p{font-size:12px}
              （GitHub Releases 附件直链 / 镜像都行）。旧版本记得去掉 .latest 类并保留 build-tag 样式。 ===== -->
     <div class="build latest">
       <div class="build-head">
-        <div class="build-title">Dracore 1.21.11 <span class="grad-flow">v1</span></div>
-        <span class="build-tag">LATEST · 最新稳定版</span>
+        <div class="build-title">Dracore 1.21.11 <span class="grad-flow" id="relVersion">v1</span></div>
+        <span class="build-tag" id="relTag">LATEST · 最新稳定版</span>
       </div>
       <div class="build-meta">
         <span><b>MC 版本：</b>1.21.11</span>
         <span><b>核心：</b>Paper 1.21.11</span>
         <span><b>格式：</b>paperclip jar</span>
         <span><b>Java：</b>21+</span>
-        <span><b>SHA-256：</b>待发布后填入</span>
+        <span><b>发布日期：</b><span id="relDate">—</span></span>
+        <span><b>大小：</b><span id="relSize">—</span></span>
       </div>
       <ul class="list changelog">
         <li>初版构建：16 条起步补丁 + 21 条批次 A 热路径优化</li>
@@ -1051,12 +1055,21 @@ footer p{font-size:12px}
         <li>并行世界 tick（SparklyPaper 移植，默认关，多世界场景启用）</li>
       </ul>
       <div class="build-actions">
-        <!-- ↓ 把 href="#" 换成真实下载直链即可 -->
-        <span class="btn btn-primary btn-disabled" aria-disabled="true">构建待发布</span>
+        <!-- ↓ 无 Release 时保持禁用态；发布后由下方脚本自动读取 releases/latest 并填充链接 -->
+        <a id="relDl" class="btn btn-primary btn-disabled" aria-disabled="true" href="#">获取最新构建…</a>
+        <a class="btn btn-ghost" href="https://github.com/dracave/dracave/releases" target="_blank" rel="noopener">GitHub Releases 页</a>
         <a class="btn btn-ghost" href="#/docs">安装与配置文档</a>
       </div>
+      <p class="build-meta" id="relStatus" style="margin-top:12px">正在从 GitHub Releases 获取最新构建信息…</p>
     </div>
     <!-- ===== 构建块结束 ===== -->
+
+    <div class="card" style="margin-top:28px;">
+      <h3>发布新版本后会怎样？</h3>
+      <p>下载按钮全自动：<b>只要在 GitHub 仓库发布一个 Release（附上 .jar 附件）</b>，这个页面就会自动读取
+      <code>releases/latest</code>，把版本号、日期、文件大小和下载直链填进上面的卡片——不需要改任何 HTML。
+      发布步骤：仓库页 → Releases → Draft a new release → 打 tag（如 v2）→ 上传 jar 附件 → Publish。</p>
+    </div>
 
     <div class="card" style="margin-top:28px;">
       <h3>安装步骤</h3>
@@ -1079,9 +1092,9 @@ footer p{font-size:12px}
       <h1><span class="dragon" aria-hidden="true" style="width:1em;height:1em;vertical-align:-0.18em"></span>Dracore <span class="grad-flow">文档</span></h1>
       <p>从安装、配置到性能分析，逐步了解 Dracore。适用版本：1.21.11</p>
       <div class="doc-nav">
-        <a href="#/docs">快速开始</a><a href="#/docs">JVM 参数</a><a href="#/docs">配置详解</a>
-        <a href="#/docs">优化原理</a><a href="#/docs">行为差异</a><a href="#/docs">压测方法</a>
-        <a href="#/docs">故障排查</a><a href="#/docs">源码构建</a>
+        <a href="#d-start">快速开始</a><a href="#d-jvm">JVM 参数</a><a href="#d-config">配置详解</a>
+        <a href="#d-principle">优化原理</a><a href="#d-diff">行为差异</a><a href="#d-bench">压测方法</a>
+        <a href="#d-trouble">故障排查</a><a href="#d-build">源码构建</a>
       </div>
     </div>
 
@@ -1280,7 +1293,10 @@ footer p{font-size:12px}
   var VIEWS = ['home', 'docs', 'download', 'faq'];
   function go(name) { location.hash = '#/' + name; }
   function applyRoute() {
-    var h = (location.hash || '#/home').replace('#/', '');
+    var hash = location.hash || '#/home';
+    // 页内锚点（#d-start 等）不参与视图切换：保持当前视图，让浏览器自然滚动
+    if (hash.indexOf('#/') !== 0) { if (typeof window.__docTocSync === 'function') window.__docTocSync(); return; }
+    var h = hash.replace('#/', '');
     if (VIEWS.indexOf(h) === -1) h = 'home';
     VIEWS.forEach(function (v) {
       document.getElementById('view-' + v).classList.toggle('active', v === h);
@@ -1289,6 +1305,7 @@ footer p{font-size:12px}
       a.classList.toggle('active', a.getAttribute('data-nav') === h);
     });
     window.scrollTo(0, 0);
+    if (typeof window.__docTocSync === 'function') window.__docTocSync();
   }
   window.addEventListener('hashchange', applyRoute);
   applyRoute();
@@ -1332,14 +1349,61 @@ footer p{font-size:12px}
     });
   })();
 
+  // ===== 下载：自动读取 GitHub Releases latest =====
+  (function initReleases(){
+    var API = 'https://api.github.com/repos/dracave/dracave/releases/latest';
+    var dl = document.getElementById('relDl');
+    var status = document.getElementById('relStatus');
+    if (!dl || !status) return;
+    function fail(msg) {
+      status.textContent = msg;
+      dl.textContent = '暂无可下载构建';
+    }
+    fetch(API, { headers: { 'Accept': 'application/vnd.github+json' } })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (rel) {
+        var assets = rel.assets || [];
+        var asset = null;
+        for (var i = 0; i < assets.length; i++) {
+          if (/\.jar$/i.test(assets[i].name)) { asset = assets[i]; break; }
+        }
+        if (!asset && assets.length) asset = assets[0];
+        var version = (rel.tag_name || '').replace(/^v/, '') || 'latest';
+        document.getElementById('relVersion').textContent = 'v' + version;
+        document.getElementById('relTag').textContent =
+          rel.prerelease ? 'PRE-RELEASE · 预发布' : 'LATEST · 最新稳定版';
+        var date = rel.published_at ? rel.published_at.slice(0, 10) : '—';
+        document.getElementById('relDate').textContent = date;
+        if (asset) {
+          document.getElementById('relSize').textContent =
+            (asset.size / 1048576).toFixed(1) + ' MB';
+          dl.href = asset.browser_download_url;
+          dl.textContent = '下载 ' + asset.name;
+        } else {
+          dl.href = rel.html_url;
+          dl.textContent = '前往 Release 页面下载';
+        }
+        dl.classList.remove('btn-disabled');
+        dl.removeAttribute('aria-disabled');
+        status.textContent = '数据源：GitHub Releases ' + (rel.tag_name || '') +
+          ' · 自动更新，无需改页面';
+      })
+      .catch(function () {
+        fail('尚未发布 Release —— 在仓库发布第一个 Release（附 .jar 附件）后，这里会自动出现下载按钮。');
+      });
+  })();
+
   // ===== 文档目录高亮 =====
   (function initDocToc(){
     var links = Array.prototype.slice.call(document.querySelectorAll('.docs-toc a'));
+    var view = document.getElementById('view-docs');
     var sections = links.map(function(a){
       return document.querySelector(a.getAttribute('href'));
     }).filter(Boolean);
     if(!sections.length) return;
     function sync(){
+      // 视图隐藏时元素 rect 全为 0，会导致高亮错位——只在文档视图可见时计算
+      if (!view.classList.contains('active')) return;
       var best = sections[0];
       sections.forEach(function(s){
         if(s.getBoundingClientRect().top <= 140) best = s;
@@ -1348,6 +1412,7 @@ footer p{font-size:12px}
         a.classList.toggle('toc-active', a.getAttribute('href') === '#' + best.id);
       });
     }
+    window.__docTocSync = sync;
     window.addEventListener('scroll', sync, {passive:true});
     sync();
   })();
